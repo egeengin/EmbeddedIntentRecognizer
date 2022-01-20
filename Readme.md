@@ -61,6 +61,13 @@ By the advantage of this pattern, any new query can be added as new handler easi
 **IntentRecognizerInterface.h** is the header file for Intent Recognizer Interface class, it consists of a pure
 virtual class and any change on the command handler can be handled thanks to the adapter design pattern.
 
+## Used third-party tools
+
+This project is built, tested, and documented using some third-party tools and services listed below.
+I would like to thank them.
+
+- [Google Test](https://github.com/google/googletest): Google Test freamwork is used for unit tests.
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
