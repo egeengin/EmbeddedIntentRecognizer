@@ -60,7 +60,7 @@ bool IntentRecognizer::LineParser(std::string input_str, Intent &intent) {
         return EXIT_FAILURE;   // Return to command line, Exit Function
     } else if (num >= intent.max_arg_num) {
         PrintWrongInput();
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     } else {
         return EXIT_SUCCESS;
     }
