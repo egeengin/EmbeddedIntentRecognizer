@@ -26,12 +26,12 @@ public:
 
     bool InputHandler(std::istream &input) override;
 
+    bool HandleUserIntents(std::string line) override;
+
     virtual ~IntentRecognizer();
 
 private:
     IntentRecognizer *MakeIntentRecognizer(Intent intent);
-
-    bool HandleUserIntents(std::string line);
 
     bool LineParser(std::string input_str, Intent &intent);
 
