@@ -1,6 +1,6 @@
 # Embedded Intent Recognizer
 
-Embedded Intent Recognizer is a simple small intent recognition command line tool using modern C++.
+Embedded Intent Recognizer is a simple, small, case-insensitive intent recognition command line tool using modern C++. 
 
 ## Compilation
 
@@ -22,14 +22,44 @@ Intent: Get Weather
 Intent: Get Weather City
 > Tell me an interesting fact.
 Intent: Get Fact
+> Make me a joke.
+Intent: Not Found, Please Try Again
+> What is the weAthEr. like in Paris today?
+Intent: Get Weather City
 >
 ```
+## Code structure
 
-## Used third-party tools
+Embedded Intent Recognizer has the tree structure given below:
 
-This project is built, tested, and documented using some third-party tools and services listed below. I would like to thank them.
+```bash
+├─── src
+│   ├─── CMakeList.txt
+│   ├─── IntentRecognizer.cpp
+│   ├─── IntentRecognizer.h
+│   ├─── IntentRecognizerInterface.h
+│   └─── main.cpp
+├─── .gitignore
+├─── LICENSE
+└─── Readme.md
+```
 
-- [Google Test](https://github.com/google/googletest): Google Test freamwork is used for unit tests.
+**Readme.md** is a readme file to describe how to code act and how to compile and run.
+
+**CMakeList.txt** file contains a set of directives and instructions describing the project's source
+files and targets (executable, library, or both).
+
+**IntentRecognizer (.cpp, .h)** is the class for handling the command line inputs and recognize the intents. If intent 
+can not be found, requests a new input. Single enter (without query) and Linux escape (ctrl+c) are handled
+as an exit. IntentRecognizer follows the singleton and factory design approaches. The singleton design
+approach is used because exactly one intent recognizer is needed to coordinate command-line
+actions across the system. A superclass specifies all standard and generic behavior (using pure virtual
+"placeholders" for creation steps), and then delegates the creation details to subclasses that are supplied by the 
+client in factory design pattern. In this project, there is a factory of handlers having set, get, delete handlers. 
+By the advantage of this pattern, any new query can be added as new handler easily.
+
+**IntentRecognizerInterface.h** is the header file for Intent Recognizer Interface class, it consists of a pure
+virtual class and any change on the command handler can be handled thanks to the adapter design pattern.
 
 ## Contributing
 
