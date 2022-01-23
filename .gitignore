@@ -3,3 +3,4 @@
 /cmake-build-debug-coverage/
 /lib/googletest/
 *.bak
+*.DS_Store

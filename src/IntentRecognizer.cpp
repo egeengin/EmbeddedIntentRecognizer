@@ -4,6 +4,8 @@
 
 #include "IntentRecognizer.h"
 
+// #define DEBUG
+
 using namespace std;
 
 // IntentRecognizer returns the same instance to adapt singleton pattern
@@ -40,18 +42,23 @@ bool NotFoundIntentRecognizer::Handle(Intent intent) {
 bool IntentRecognizer::LineParser(std::string input_str, Intent &intent) {
     stringstream s(input_str);
     string word;
-    int num = 0;
+    int num = 0, intent_id;
 
-    intent.name = "";
+    static bool initialized;
+    if (!initialized) {
+        initialized = true;
+        InitTrie();
+    }
+
+    intent.ID.clear();
     while (s >> word) {
-        LowerString(word);
-        if (word == "weather") {
-            intent.name = "weather";
-        } else if (word == "fact") {
-            intent.name = "fact";
-        } else if ((word == "in") & (intent.name == "weather")) {
-            intent.name = "city";
-        }
+        MakeLowerCase(word);
+        intent_id = headTrie->search(word);
+#ifdef DEBUG
+        cout << "Word: " << word << " -> Intent: " << intentList[intent_id] << endl;
+#endif
+        if (intent_id)
+            intent.ID.insert(intent_id);
         num++;
     }
 
@@ -66,10 +73,10 @@ bool IntentRecognizer::LineParser(std::string input_str, Intent &intent) {
     }
 }
 
-void IntentRecognizer::LowerString(std::string &input_str) {
+void IntentRecognizer::MakeLowerCase(std::string &input_str) {
     int j = 0;
     for (int i = 0; i < input_str.size(); i++) {
-        // Store only characters until non-alphabet characters {'.',',',';',...)
+        // Store only letters until non-alphabet characters {'.',',',';',...)
         if (input_str[i] >= 'A' && input_str[i] <= 'Z') {
             input_str[j] = input_str[i] - 'Z' + 'z';
             j++;
@@ -87,15 +94,57 @@ void IntentRecognizer::PrintWrongInput() {
     cout << "Wrong input" << endl;
 }
 
+void IntentRecognizer::InitTrie() {
+    int intentId;
+
+    auto GetIndex = [](vector<string> S, std::string K) {
+        int Index = 0;
+        // Traverse the vector
+        for (auto u: S) {
+            if (u == K)
+                return Index;
+            Index++;
+        }
+        return -1; // If not in vector
+    };
+
+    for (const auto&[word, intent]: wordIntentMap) {
+        intentId = GetIndex(intentList, intent);
+        if (intentId != -1) {
+            headTrie->insert(word, intentId);
+        }
+#ifdef DEBUG
+        else
+            cout << "Not in intent list but in a map: " << intent << endl;
+#endif
+    }
+
+}
+
 IntentRecognizer *IntentRecognizer::MakeIntentRecognizer(Intent intent) {
-    if (intent.name == intent.intentList[0]) {
-        return new WeatherIntentRecognizer;
-    } else if (intent.name == intent.intentList[1]) {
-        return new WeatherCityIntentRecognizer;
-    } else if (intent.name == intent.intentList[2]) {
-        return new FactIntentRecognizer;
-    } else { // Intent not found
-        return new NotFoundIntentRecognizer;
+    if (intent.ID.size() == 1) {
+        for (const int &id: intent.ID) {
+#ifdef DEBUG
+            cout << "Intents found: " << intentList[id] << endl;
+#endif
+            switch (id) {
+                case 1:
+                    return new WeatherIntentRecognizer;
+                case 3:
+                    return new FactIntentRecognizer;
+                default:
+                    return new NotFoundIntentRecognizer;
+            }
+        }
+    } else if (intent.ID.size() == 2) {
+        bool isWeatherInSet = intent.ID.find(1) != intent.ID.end();
+        bool isCityInSet = intent.ID.find(2) != intent.ID.end();
+        if (isWeatherInSet && isCityInSet)
+            return new WeatherCityIntentRecognizer;
+        else
+            return new NotFoundIntentRecognizer; // not recognized
+    } else {
+        return new NotFoundIntentRecognizer; // not recognized
     }
 }
 
