@@ -1,29 +1,25 @@
-#include <signal.h>
-#include <cstdlib>
-#include <iostream>
-
 #include "IntentRecognizer.h"
+
+#include <signal.h>
+#include <string>
+#include <iostream>
 
 using namespace std;
 
-#define NUM_QUERY 3
-#define NUM_ARG_MAX 3
-
 // Define the function to be called when ctrl-c (SIGINT) is sent to process
 void signal_callback_handler(int signum) {
-    // Terminate program
-    exit(signum);
+    exit(signum); // Terminate program
 }
 
-
 int main() {
-    IntentRecognizerInterface &CmdHandler = IntentRecognizer::GetHandler();
+    string line;
+    IntentRecognizerInterface &intentRecognizer = IntentRecognizer::GetHandler();
 
-    // Register signal and signal handler
-    signal(SIGINT, signal_callback_handler);
+    signal(SIGINT, signal_callback_handler); // Register signal and signal handler
 
     while (1) {
-        if (CmdHandler.InputHandler(std::cin))
+        line = intentRecognizer.GetLine(std::cin);
+        if (intentRecognizer.RecognizeIntents(line))
             return EXIT_SUCCESS;
     }
 }

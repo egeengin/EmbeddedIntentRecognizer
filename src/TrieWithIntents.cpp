@@ -1,11 +1,13 @@
 #include "TrieWithIntents.h"
-#include <iostream>
-
 // #define DEBUG
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 using namespace std;
 
-// TrieWithIntents: Class of a modifiedTrie which has intentID in the end node.
+// TrieWithIntents: Class of a modifiedTrie which has listIntentID in the end node.
 TrieWithIntents::TrieWithIntents() {
     this->isLeaf = false;
     this->end = true;
@@ -33,7 +35,7 @@ void TrieWithIntents::insert(string word, int intentID) {
     if (currentNode->end) {
         currentNode->intentID = intentID;
 #ifdef DEBUG
-        std::cout << "Trie.insert: " << word << ":" << intentID << endl; // TODO: Debug (will be deleted on delivery)
+        std::cout << "Trie.insert: " << word << ":" << listIntentID << endl; // TODO: Debug (will be deleted on delivery)
 #endif
     }
 }
@@ -56,13 +58,4 @@ int TrieWithIntents::search(string key) {
         return currentNode->intentID;
     else
         return 0;
-}
-
-bool TrieWithIntents::haveChildren(TrieWithIntents const *currentNode) {
-    for (int i = 0; i < ALPHABET_SIZE; i++) {
-        if (currentNode->letter[i]) {
-            return true;    // child found
-        }
-    }
-    return false;
 }

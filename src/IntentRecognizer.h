@@ -1,41 +1,38 @@
 #ifndef EMBEDDEDINTENTRECOGNIZER_INTENTRECOGNIZER_H
 #define EMBEDDEDINTENTRECOGNIZER_INTENTRECOGNIZER_H
 
+#include "IntentRecognizerInterface.h"
+#include "TrieWithIntents.h"
+#include "IntentFactory.h"
+#include "Intent.h"
+
 #include <string>
 #include <vector>
 #include <set>
 #include <unordered_map>
-#include "IntentRecognizerInterface.h"
-#include "TrieWithIntents.h"
-
-class Intent {
-public:
-    const int max_arg_num = 15;
-    std::set<int> ID;
-};
 
 // Handle command line commands
-// DESIGN PATTERN: Factory Design Pattern
+// DESIGN PATTERN: Singleton Design Pattern
 class IntentRecognizer : public IntentRecognizerInterface {
 public:
-    IntentRecognizer() = default;
-
     static IntentRecognizer &GetHandler();
 
     IntentRecognizer(const IntentRecognizer &orig) = delete;
 
-    virtual bool Handle(Intent intent);
+    std::string GetLine(std::istream &input) override;
 
-    bool InputHandler(std::istream &input) override;
+    bool RecognizeIntents(std::string line) override;
 
-    bool HandleUserIntents(std::string line) override;
-
-    virtual ~IntentRecognizer();
+    virtual ~IntentRecognizer() = default;
 
 private:
+    const int maxArgNum = 15;
+
     TrieWithIntents *headTrie = new TrieWithIntents();
 
-    std::vector<std::string> intentList{"not_found", "weather", "city", "fact"};
+    IntentFactory &intentFactory = IntentFactory::GetHandler();
+
+    std::set<int> listIntentID;
 
     std::unordered_map<std::string, std::string> wordIntentMap = {
             {"weather", "weather"},
@@ -44,36 +41,19 @@ private:
             {"in",      "city"},
     };
 
-    IntentRecognizer *MakeIntentRecognizer(Intent intent);
-
-    bool LineParser(std::string input_str, Intent &intent);
-
-    void MakeLowerCase(std::string &input_str);
-
-    void PrintWrongInput();
+    IntentRecognizer();
 
     void InitTrie();
-};
 
-// Simply add new intent recognizers if defined
-class WeatherIntentRecognizer : public IntentRecognizer {
-public:
-    bool Handle(Intent intent);
-};
+    bool StringToIntentConverter(std::string input_str);
 
-class WeatherCityIntentRecognizer : public IntentRecognizer {
-public:
-    bool Handle(Intent intent);
-};
+    void MakeLowerCase(std::string &inputStr);
 
-class FactIntentRecognizer : public IntentRecognizer {
-public:
-    bool Handle(Intent intent);
-};
+    bool *HandleIntent(Intent *intent);
 
-class NotFoundIntentRecognizer : public IntentRecognizer {
-public:
-    bool Handle(Intent intent);
+    Intent *GetIntent();
+
+    void PrintWrongInput();
 };
 
 #endif //EMBEDDEDINTENTRECOGNIZER_INTENTRECOGNIZER_H

@@ -7,15 +7,13 @@
 // DESIGN PATTERN: Interface Design Pattern
 class IntentRecognizerInterface {
 public:
-    IntentRecognizerInterface() {
-    };
+    IntentRecognizerInterface() = default;
 
-    virtual bool InputHandler(std::istream &input) = 0; //Any input stream method can be used like std::cin
+    virtual std::string GetLine(std::istream &input) = 0; //Any input stream method can be used like std::cin
 
-    virtual bool HandleUserIntents(std::string line) = 0; //Test purposes
+    virtual bool RecognizeIntents(std::string line) = 0; //Test purposes
 
-    virtual ~IntentRecognizerInterface() {
-    };
+    virtual ~IntentRecognizerInterface() = default;
 };
 
 #endif //EMBEDDEDINTENTRECOGNIZER_INTENTRECOGNIZERINTERFACE_H
