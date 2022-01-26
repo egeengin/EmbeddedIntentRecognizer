@@ -4,8 +4,6 @@
 #include <iostream>
 #include <fstream>
 
-// #define DEBUG
-
 using namespace std;
 
 IntentRecognizer &IntentRecognizer::GetHandler() {
@@ -32,7 +30,7 @@ bool IntentRecognizer::RecognizeIntents(std::string line) {
 IntentRecognizer::IntentRecognizer() {
     try {
         if (InitTrie()) {
-            throw;
+            throw; // Can not initialize
         }
     }
     catch (...) {
@@ -70,15 +68,6 @@ bool IntentRecognizer::InitTrie() {
         return -1; // If not in vector
     };
 
-    auto RemoveQuotes = [](std::string str) {
-        return str.substr(1, str.size() - 2);
-    };
-
-    auto PrintIntentChanged = [](std::string word, std::string oldIntentID, std::string newintentID) {
-        cout << "JSON Input: " << word << " given with intent " << oldIntentID << " is changed to " << newintentID
-             << endl;
-    };
-
     auto PrintIntentHandleNotExist = [](std::string word, std::string intent) {
         cout << "JSON Input: " << word << " for intent " << intent << " can not handled" << endl;
     };
@@ -91,11 +80,6 @@ bool IntentRecognizer::InitTrie() {
 
         intentID = GetIndex(intentFactory.intentList, intent);
         if (intentID != -1) {
-            oldIntentID = headTrie->search(word);
-            if ((oldIntentID != 0) && (oldIntentID != intentID)) {
-                PrintIntentChanged(word, intentFactory.intentList[oldIntentID],
-                                   intentFactory.intentList[intentID]);
-            }
             headTrie->insert(word, intentID);
         } else {
             PrintIntentHandleNotExist(word, intent);
@@ -113,9 +97,6 @@ bool IntentRecognizer::StringToIntentConverter(std::string input_str) {
     while (s >> word) {
         MakeLowerCase(word);
         intentID = headTrie->search(word);
-#ifdef DEBUG
-        cout << "Word: " << word << " -> Intent ID: " << intentID << endl;
-#endif
         if (intentID)
             listIntentID.insert(intentID);
         numArg++;

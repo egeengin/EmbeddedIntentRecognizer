@@ -1,12 +1,5 @@
 #include "IntentFactory.h"
 
-//#define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-using namespace std;
-#endif
-
 // IntentFactory returns the same instance to adapt singleton pattern
 IntentFactory &IntentFactory::GetHandler() {
     static IntentFactory handler;
@@ -16,9 +9,6 @@ IntentFactory &IntentFactory::GetHandler() {
 Intent *IntentFactory::GetIntent(std::set<int> intentIDList) {
     if (intentIDList.size() == 1) {
         for (const int &id: intentIDList) {
-#ifdef DEBUG
-            cout << "Intents found for ID: " << id << endl;
-#endif
             switch (id) {
                 case 1:
                     return new WeatherIntent;

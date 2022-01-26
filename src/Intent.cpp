@@ -2,8 +2,6 @@
 #include <string>
 #include <iostream>
 
-// #define DEBUG
-
 using namespace std;
 
 bool WeatherIntent::Handle() {

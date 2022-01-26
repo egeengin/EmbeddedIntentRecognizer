@@ -1,9 +1,4 @@
 #include "TrieWithIntents.h"
-// #define DEBUG
-
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 using namespace std;
 
@@ -34,9 +29,6 @@ void TrieWithIntents::insert(string word, int intentID) {
 
     if (currentNode->end) {
         currentNode->intentID = intentID;
-#ifdef DEBUG
-        std::cout << "Trie.insert: " << word << ":" << listIntentID << endl; // TODO: Debug (will be deleted on delivery)
-#endif
     }
 }
 
