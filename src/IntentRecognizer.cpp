@@ -2,7 +2,7 @@
 
 #include <string>
 #include <iostream>
-#include <sstream>
+#include <fstream>
 
 // #define DEBUG
 
@@ -31,15 +31,34 @@ bool IntentRecognizer::RecognizeIntents(std::string line) {
 
 IntentRecognizer::IntentRecognizer() {
     try {
-        InitTrie();
+        if (InitTrie()) {
+            throw;
+        }
     }
     catch (...) {
         cout << "Intent recognizer cannot be initialized!" << endl;
     }
 }
 
-void IntentRecognizer::InitTrie() {
-    int intentID;
+bool IntentRecognizer::ReadJsonFile(nlohmann::json &jsonObject, std::string fileName = Word2IntentFile) {
+    ifstream jsonStream("../../data/" + fileName);
+    if (!jsonStream.is_open()) {
+        return EXIT_FAILURE;
+    } else {
+        jsonStream >> jsonObject;
+        jsonStream.close();
+        return EXIT_SUCCESS;
+    }
+}
+
+bool IntentRecognizer::InitTrie() {
+    int intentID, oldIntentID;
+    nlohmann::json jsonObject;
+    string word, intent;
+
+    if (ReadJsonFile(jsonObject)) {
+        return EXIT_FAILURE; // No file
+    }
 
     auto GetIndex = [](vector<string> list, std::string wanted) {
         int Index = 0;
@@ -51,16 +70,38 @@ void IntentRecognizer::InitTrie() {
         return -1; // If not in vector
     };
 
-    for (const auto&[word, intent]: wordIntentMap) {
+    auto RemoveQuotes = [](std::string str) {
+        return str.substr(1, str.size() - 2);
+    };
+
+    auto PrintIntentChanged = [](std::string word, std::string oldIntentID, std::string newintentID) {
+        cout << "JSON Input: " << word << " given with intent " << oldIntentID << " is changed to " << newintentID
+             << endl;
+    };
+
+    auto PrintIntentHandleNotExist = [](std::string word, std::string intent) {
+        cout << "JSON Input: " << word << " for intent " << intent << " can not handled" << endl;
+    };
+
+    for (auto &el: jsonObject.items()) {
+        word = el.key();
+        intent = el.value();
+        MakeLowerCase(word);
+        MakeLowerCase(intent);
+
         intentID = GetIndex(intentFactory.intentList, intent);
         if (intentID != -1) {
+            oldIntentID = headTrie->search(word);
+            if ((oldIntentID != 0) && (oldIntentID != intentID)) {
+                PrintIntentChanged(word, intentFactory.intentList[oldIntentID],
+                                   intentFactory.intentList[intentID]);
+            }
             headTrie->insert(word, intentID);
+        } else {
+            PrintIntentHandleNotExist(word, intent);
         }
-#ifdef DEBUG
-        else
-            cout << "Not in intent list but in a map: " << intent << endl;
-#endif
     }
+    return EXIT_SUCCESS;
 }
 
 bool IntentRecognizer::StringToIntentConverter(std::string input_str) {
@@ -107,8 +148,8 @@ void IntentRecognizer::MakeLowerCase(std::string &inputStr) {
     }
 }
 
-bool *IntentRecognizer::HandleIntent(Intent *intent) {
-    intent->Handle();
+bool IntentRecognizer::HandleIntent(Intent *intent) {
+    return intent->Handle();
 }
 
 Intent *IntentRecognizer::GetIntent() {

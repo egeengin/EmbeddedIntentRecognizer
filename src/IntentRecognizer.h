@@ -6,6 +6,8 @@
 #include "IntentFactory.h"
 #include "Intent.h"
 
+#include "json.hpp"
+
 #include <string>
 #include <vector>
 #include <set>
@@ -41,15 +43,19 @@ private:
             {"in",      "city"},
     };
 
+    inline static const std::string Word2IntentFile = "Word2Intent.json";
+
+    bool ReadJsonFile(nlohmann::json &jsonObject, std::string fileName);
+
     IntentRecognizer();
 
-    void InitTrie();
+    bool InitTrie();
 
     bool StringToIntentConverter(std::string input_str);
 
     void MakeLowerCase(std::string &inputStr);
 
-    bool *HandleIntent(Intent *intent);
+    bool HandleIntent(Intent *intent);
 
     Intent *GetIntent();
 

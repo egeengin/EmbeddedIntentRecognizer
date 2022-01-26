@@ -1,6 +1,6 @@
 #include "IntentRecognizer.h"
 
-#include <signal.h>
+#include <csignal>
 #include <string>
 #include <iostream>
 
@@ -17,7 +17,7 @@ int main() {
 
     signal(SIGINT, signal_callback_handler); // Register signal and signal handler
 
-    while (1) {
+    while (true) {
         line = intentRecognizer.GetLine(std::cin);
         if (intentRecognizer.RecognizeIntents(line))
             return EXIT_SUCCESS;

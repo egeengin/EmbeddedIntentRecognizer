@@ -17,6 +17,7 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 include_directories(src)
+include_directories(lib/nlohmann)
 include_directories(lib/googletest/googletest/include/ lib/googletest/googletest/)
 
 add_subdirectory(src)
