@@ -7,6 +7,7 @@
 #include <string>
 #include <set>
 #include <vector>
+#include <memory>
 
 // DESIGN PATTERN: Singleton and Factor Design Patterns
 class IntentFactory {

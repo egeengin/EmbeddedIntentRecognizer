@@ -10,7 +10,7 @@ IntentFactory class.
 Run the following commands to create the binary.
 
 ```bash
-$ mkdir build && cmake .. && make
+$ mkdir build && cd build && cmake .. && make
 ```
 
 ## Usage
