@@ -73,6 +73,10 @@ Embedded Intent Recognizer has the tree structure given below:
 │   ├─── main.cpp
 │   ├─── TrieWithIntents.cpp
 │   └─── TrieWithIntents.h
+├─── tst
+│   ├─── CMakeList.txt
+│   ├─── main.cpp
+│   └─── testIntentRecognizer.cpp
 ├─── .gitignore
 ├─── LICENSE
 └─── Readme.md
@@ -102,6 +106,8 @@ the advantage of this pattern, any new inserted query can be called easily.
 , "Fact"}. A new intent can be inserted with its handle to enlarge recognition capability to be called in IntentFactory.
 
 **TrieWithIntents (.cpp, .h)** is the class to create modified Trie which is a Trie having ID on their bottom leaf.
+
+**testIntentRecognizer (.cpp,)** is the test file for IntentRecognizer class using Google Test.
 
 ## Used third-party tools
 
