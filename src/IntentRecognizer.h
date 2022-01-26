@@ -11,53 +11,43 @@
 #include <string>
 #include <vector>
 #include <set>
-#include <unordered_map>
 
 // Handle command line commands
 // DESIGN PATTERN: Singleton Design Pattern
 class IntentRecognizer : public IntentRecognizerInterface {
+private:
+    const int maxArgNum = 15;
+
+    inline static const std::string Word2IntentFile = "Word2Intent.json";
+
+    inline static const std::vector<std::string> definedIntents{"not_found", "weather", "city", "fact"};
+
+private:
+    std::unique_ptr<TrieWithIntents> headTrie = std::make_unique<TrieWithIntents>();
+
+    IntentFactory &intentFactory = IntentFactory::GetHandler();
+
 public:
     static IntentRecognizer &GetHandler();
 
     IntentRecognizer(const IntentRecognizer &orig) = delete;
-
-    std::string GetLine(std::istream &input) override;
 
     bool RecognizeIntents(std::string line) override;
 
     virtual ~IntentRecognizer() = default;
 
 private:
-    const int maxArgNum = 15;
-
-    TrieWithIntents *headTrie = new TrieWithIntents();
-
-    IntentFactory &intentFactory = IntentFactory::GetHandler();
-
-    std::set<int> listIntentID;
-
-    std::unordered_map<std::string, std::string> wordIntentMap = {
-            {"weather", "weather"},
-            {"rainy",   "weather"},
-            {"fact",    "fact"},
-            {"in",      "city"},
-    };
-
-    inline static const std::string Word2IntentFile = "Word2Intent.json";
+    IntentRecognizer();
 
     bool ReadJsonFile(nlohmann::json &jsonObject, std::string fileName);
 
-    IntentRecognizer();
-
     bool InitTrie();
 
-    bool StringToIntentConverter(std::string input_str);
+    bool CheckInputString(std::string inputStr);
+
+    std::unique_ptr<std::set<int>> GetIntentIDList(std::string inputStr);
 
     void MakeLowerCase(std::string &inputStr);
-
-    bool HandleIntent(Intent *intent);
-
-    Intent *GetIntent();
 
     void PrintWrongInput();
 };

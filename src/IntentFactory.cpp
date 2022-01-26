@@ -6,25 +6,21 @@ IntentFactory &IntentFactory::GetHandler() {
     return handler;
 }
 
-Intent *IntentFactory::GetIntent(std::set<int> intentIDList) {
-    if (intentIDList.size() == 1) {
-        for (const int &id: intentIDList) {
-            switch (id) {
-                case 1:
-                    return new WeatherIntent;
-                case 3:
-                    return new FactIntent;
-                default:
-                    return new NotFoundIntent;
-            }
+std::unique_ptr<Intent> IntentFactory::GetIntent(std::unique_ptr<std::set<int>> intentIDList) {
+    if (intentIDList->size() == 1) {
+        switch (*intentIDList->begin()) { // Take first element from set
+            case 1:
+                return std::make_unique<WeatherIntent>();
+            case 3:
+                return std::make_unique<FactIntent>();
+            default:
+                return std::make_unique<NotFoundIntent>();
         }
-    } else if (intentIDList.size() == 2) {
-        bool isWeatherInSet = intentIDList.find(1) != intentIDList.end();
-        bool isCityInSet = intentIDList.find(2) != intentIDList.end();
+    } else if (intentIDList->size() == 2) {
+        bool isWeatherInSet = intentIDList->find(1) != intentIDList->end();
+        bool isCityInSet = intentIDList->find(2) != intentIDList->end();
         if (isWeatherInSet && isCityInSet)
-            return new WeatherCityIntent;
-        else
-            return new NotFoundIntent; // not recognized
+            return std::make_unique<WeatherCityIntent>();
     }
-    return new NotFoundIntent; // not recognized
+    return std::make_unique<NotFoundIntent>(); // not recognized
 }

@@ -33,11 +33,6 @@ void TrieWithIntents::insert(string word, int intentID) {
 }
 
 int TrieWithIntents::search(string key) {
-    // return false if Trie is empty
-    if (this == nullptr) {
-        return false;
-    }
-
     TrieWithIntents *currentNode = this;
     for (int i = 0; i < key.length(); i++) {
         currentNode = currentNode->letter[key[i] - 'a']; //next node

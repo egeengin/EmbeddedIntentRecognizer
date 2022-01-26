@@ -18,7 +18,8 @@ int main() {
     signal(SIGINT, signal_callback_handler); // Register signal and signal handler
 
     while (true) {
-        line = intentRecognizer.GetLine(std::cin);
+        string line;
+        getline(std::cin, line);
         if (intentRecognizer.RecognizeIntents(line))
             return EXIT_SUCCESS;
     }

@@ -6,25 +6,19 @@
 
 using namespace std;
 
+// IntentRecognizer returns the same instance to adapt singleton pattern
 IntentRecognizer &IntentRecognizer::GetHandler() {
     static IntentRecognizer handler;
     return handler;
 }
 
-string IntentRecognizer::GetLine(std::istream &input = std::cin) {
-    string line;
-    getline(input, line);
-    return line;
-}
-
-// IntentRecognizer returns the same instance to adapt singleton pattern
 bool IntentRecognizer::RecognizeIntents(std::string line) {
-    if (StringToIntentConverter(line)) {
+    if (CheckInputString(line)) {
         return EXIT_FAILURE; // Exit sequence is entered
-    } else {
-        Intent *intent = GetIntent();
-        return HandleIntent(intent);
     }
+    std::unique_ptr<std::set<int>> listIntentID = GetIntentIDList(line);
+    std::unique_ptr<Intent> intent = intentFactory.GetIntent(std::move(listIntentID));
+    return intent->Handle();
 }
 
 IntentRecognizer::IntentRecognizer() {
@@ -50,9 +44,9 @@ bool IntentRecognizer::ReadJsonFile(nlohmann::json &jsonObject, std::string file
 }
 
 bool IntentRecognizer::InitTrie() {
-    int intentID, oldIntentID;
+    int intentID;
     nlohmann::json jsonObject;
-    string word, intent;
+    string word = "", intent = "";
 
     if (ReadJsonFile(jsonObject)) {
         return EXIT_FAILURE; // No file
@@ -78,7 +72,7 @@ bool IntentRecognizer::InitTrie() {
         MakeLowerCase(word);
         MakeLowerCase(intent);
 
-        intentID = GetIndex(intentFactory.intentList, intent);
+        intentID = GetIndex(definedIntents, intent);
         if (intentID != -1) {
             headTrie->insert(word, intentID);
         } else {
@@ -88,17 +82,11 @@ bool IntentRecognizer::InitTrie() {
     return EXIT_SUCCESS;
 }
 
-bool IntentRecognizer::StringToIntentConverter(std::string input_str) {
-    stringstream s(input_str);
-    string word;
-    int numArg = 0, intentID;
-
-    listIntentID.clear();
-    while (s >> word) {
-        MakeLowerCase(word);
-        intentID = headTrie->search(word);
-        if (intentID)
-            listIntentID.insert(intentID);
+bool IntentRecognizer::CheckInputString(std::string inputStr) {
+    stringstream stream(inputStr);
+    string word = "";
+    int numArg = 0;
+    while (stream >> word) {
         numArg++;
     }
 
@@ -110,6 +98,22 @@ bool IntentRecognizer::StringToIntentConverter(std::string input_str) {
     } else {
         return EXIT_SUCCESS;
     }
+}
+
+std::unique_ptr<std::set<int>> IntentRecognizer::GetIntentIDList(std::string inputStr) {
+    stringstream stream(inputStr);
+    string word;
+    std::unique_ptr<std::set<int>> intentIDList = std::make_unique<std::set<int>>();
+    int intentID;
+
+    intentIDList->clear();
+    while (stream >> word) {
+        MakeLowerCase(word);
+        intentID = headTrie->search(word);
+        if (intentID)
+            intentIDList->insert(intentID);
+    }
+    return intentIDList;
 }
 
 void IntentRecognizer::MakeLowerCase(std::string &inputStr) {
@@ -127,14 +131,6 @@ void IntentRecognizer::MakeLowerCase(std::string &inputStr) {
             break;
         }
     }
-}
-
-bool IntentRecognizer::HandleIntent(Intent *intent) {
-    return intent->Handle();
-}
-
-Intent *IntentRecognizer::GetIntent() {
-    return intentFactory.GetIntent(listIntentID);
 }
 
 void IntentRecognizer::PrintWrongInput() {

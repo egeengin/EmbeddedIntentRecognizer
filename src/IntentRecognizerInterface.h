@@ -8,9 +8,7 @@
 class IntentRecognizerInterface {
 public:
     IntentRecognizerInterface() = default;
-
-    virtual std::string GetLine(std::istream &input) = 0; //Any input stream method can be used like std::cin
-
+    
     virtual bool RecognizeIntents(std::string line) = 0; //Test purposes
 
     virtual ~IntentRecognizerInterface() = default;

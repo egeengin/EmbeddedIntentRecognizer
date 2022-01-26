@@ -13,11 +13,9 @@ class IntentFactory {
 public:
     IntentFactory() = default;
 
-    std::vector<std::string> intentList{"not_found", "weather", "city", "fact"};
-
     static IntentFactory &GetHandler();
 
-    Intent *GetIntent(std::set<int> intentIDList);
+    std::unique_ptr<Intent> GetIntent(std::unique_ptr<std::set<int>> intentIDList);
 };
 
 
